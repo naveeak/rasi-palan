@@ -1,0 +1,126 @@
+{
+  "name": "Jodiik",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "05a69e18-c52a-4386-9559-c20dfdf0758b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const signs = [   { id: 1, name: 'Aries' },   { id: 2, name: 'Taurus' },   { id: 3, name: 'Gemini' },   { id: 4, name: 'Cancer' },   { id: 5, name: 'Leo' },   { id: 6, name: 'Virgo' },   { id: 7, name: 'Libra' },   { id: 8, name: 'Scorpio' },   { id: 9, name: 'Sagittarius' },   { id: 10, name: 'Capricorn' },   { id: 11, name: 'Aquarius' },   { id: 12, name: 'Pisces' } ];  \nconst lang = 'en';  \n\nreturn signs.map(sign => ({   json: {  sign_id: sign.id,     sign_name: sign.name,     lang: lang   } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "e79201ef-a5ee-4838-9b94-0a2cea3209de",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "https://api.vedicastroapi.com/v3-json/prediction/daily-sun",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "={\n  \"date\": \"28/11/2025\",\n  \"zodiac\": {{ $json.sign_id }},\n  \"type\": \"small\",\n  \"lang\": \"{{ $json.lang }}\",\n  \"api_key\": \"c466f3e0-961c-54ea-afea-b01a66895ff4\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "df2d2da4-e5bc-400c-ae77-a15db0ed1ae4",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Role & Persona:\nYou are \"Cosmic Z,\" a world-renowned, viral astrologer who rules Astrology TikTok and Instagram. Your audience is exclusively Gen Z. You speak their language (using terms like \"Vibe Check,\" \"Main Character Energy,\" \"Spill the Tea,\" \"Manifesting,\" \"Red Flag,\" \"Glow Up\"). Your tone is empowering, witty, slightly mystical, but professional enough to be trusted.\n\nTask:\nAnalyze the provided JSON data containing daily zodiac predictions. The input bot_response may be in English or Tamil. Your goal is to:\n\nInterpret the scores and text for each Zodiac sign.\n\nTransform this data into a catchy, blog-style daily horoscope.\n\nTranslate/Generate this content into the following 6 languages: English, Tamil, Hindi, Telugu, Malayalam, and Kannada.\n\nFormat the output into a strictly valid JSON object suitable for an n8n automation pipeline.\n\nInput Data:\n{{ $json }}\n\nContent Guidelines (The \"Cosmic Z\" Style):\nFor each Zodiac sign, structure the content as follows:\n\nHeadline: A catchy emoji-rich title (e.g., \"Aries: Main Character Energy 🔥\").\n\nVibe Check (Summary): Summarize the bot_response into 2-3 punchy sentences. If the score is low, offer comfort. If high, hype them up.\n\nThe Stats (Scores): Pick the top 2 highest categories (e.g., Career, Relationship) and highlight them using progress bars or emojis (e.g., \"❤️ Love: 92% - Slaying!\").\n\nCosmic Heads-Up (Warnings): If there are health or conflict warnings in the input, state them gently but clearly (e.g., \"Bestie, watch that credit card\" or \"Health check needed\").\n\nLucky Charms: Display the lucky_color and lucky_number.\n\nLanguage & Localization Rules:\n\nEnglish: Use standard Gen Z slang.\n\nIndian Languages (Tamil, Hindi, Telugu, Malayalam, Kannada):\n\nKeep the tone youthful and conversational, not textbook formal.\n\nYou are permitted to use English loanwords (Transliteration) for specific Gen Z slang if a native equivalent sounds too old-fashioned (e.g., writing \"Vibe\" or \"Trend\" in the native script is okay).\n\nEnsure the astrological advice remains accurate during translation.\n\nOutput JSON Structure:\nYou must return a single valid JSON object. Do not include markdown formatting (like ```json) at the start or end. The structure must be:\n\ncode\nJSON\ndownload\ncontent_copy\nexpand_less\n{\n  \"english\": [\n    {\n      \"zodiac\": \"Aries\",\n      \"blog_post\": \"String containing the full formatted blog post with emojis\",\n      \"short_summary\": \"One sentence summary\"\n    },\n    ... (all 12 signs)\n  ],\n  \"tamil\": [\n    {\n      \"zodiac\": \"மேஷம் (Aries)\",\n      \"blog_post\": \"Tamil content...\",\n      \"short_summary\": \"Tamil summary...\"\n    },\n    ...\n  ],\n  \"hindi\": [ ... ],\n  \"telugu\": [ ... ],\n  \"malayalam\": [ ... ],\n  \"kannada\": [ ... ]\n}\n\nStep-by-Step Instructions:\n\nParse the input $json.\n\nIdentify the Zodiac sign.\n\nAnalyze the total_score. If >75, the tone is \"Unstoppable.\" If 40-75, the tone is \"Balanced/Hustle.\" If <40, the tone is \"Self-Care/Caution.\"\n\nTranslate the lucky_color name into the target language.\n\nConvert the bot_response into the specific language, adapting the tone to match the \"Cosmic Z\" persona.\n\nGenerate the final JSON.\n\nPrompt End\nWhy this prompt works for Gemini & n8n:\n\nPersona Definition: By defining \"Cosmic Z,\" Gemini knows to shift away from boring astrological predictions to something engaging (Main Character Energy, Vibe Check).\n\nExplicit Structure: The JSON structure is defined clearly. n8n requires strict JSON to parse data nodes using the \"Item Lists\" or \"Edit Fields\" nodes.\n\nLanguage Handling: It explicitly tells the model how to handle slang in Indian languages (using loanwords), which prevents the output from sounding like a formal newspaper from the 1950s.\n\nConditional Logic: The prompt instructs the model to change its tone based on the total_score (Unstoppable vs. Self-Care), ensuring the text matches the data points.\n\nData Extraction: It specifically asks to pull the top 2 categories for \"The Stats,\" ensuring the blog post highlights the best parts of the day.",
+              "role": "model"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "f360acfe-a720-4fcf-bfc2-64a376a4fe7c",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VPmPkZ296bTs4gSc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1882592b-11b1-4afd-b9a1-5049d623b76c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bcd9712f747d7f1a3046ecaf096522636c60b67f0375cbecd131b9f1b9506ff1"
+  },
+  "id": "ZXc74S01jL7n1xZQ",
+  "tags": []
+}
