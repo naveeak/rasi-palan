@@ -158,8 +158,7 @@ async def analyze_text(request: AnalysisRequest):
         "line2": best_kural.get("Line2"),
         "eng": best_kural.get("Translation"),
         "eng_exp": best_kural.get("explanation"),
-        "chapter_group_eng": "Unknown", 
-        "chapter_eng": "Unknown"
+        "mk": best_kural.get("mk")  # Tamil meaning
     }
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

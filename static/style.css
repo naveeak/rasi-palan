@@ -172,7 +172,7 @@ button:disabled {
 
 .kural-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     color: var(--text-secondary);
     font-size: 0.875rem;
     margin-bottom: 1.5rem;
@@ -184,12 +184,24 @@ button:disabled {
     margin-bottom: 2rem;
 }
 
+.tamil-meaning-section {
+    margin-bottom: 2rem;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
 .tamil-text {
     font-family: 'Noto Sans Tamil', sans-serif;
     font-size: 1.5rem;
     font-weight: 500;
     color: var(--text-primary);
     line-height: 2;
+}
+
+.tamil-meaning-section .tamil-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
 }
 
 .english-section,

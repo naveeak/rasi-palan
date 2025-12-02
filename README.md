@@ -18,7 +18,7 @@ This application uses **AI-powered semantic search** to find the most contextual
 - 🌐 **URL Analysis**: Submit article URLs for automatic content extraction and analysis
 - 🤖 **Local AI**: Uses `sentence-transformers` for embeddings (no API keys required)
 - 🎯 **Semantic Search**: Finds kurals based on meaning, not just keywords
-- 🌍 **Bilingual Display**: Shows Tamil text with English translation and explanation
+- 🌍 **Bilingual Display**: Shows Tamil text, Tamil meaning, English translation, and detailed explanation
 - ⚡ **Fast & Efficient**: Pre-computed embeddings for instant results
 - 🎨 **Clean UI**: Simple, responsive interface built with vanilla HTML/CSS
 
@@ -96,6 +96,18 @@ thirukural-recommender/
 3. **Text Extraction**: For URLs, uses BeautifulSoup to extract main article content
 4. **Semantic Search**: Computes cosine similarity between input and all kurals
 5. **Result Display**: Returns the most relevant Thirukkural with Tamil text, translation, and meaning
+
+## 🎨 What You'll See
+
+When you analyze text or a URL, the app displays:
+
+1. **Kural Number**: The specific kural number (1-1330)
+2. **Tamil Kural**: The two-line couplet in beautiful Tamil script
+3. **தமிழ் பொருள் (Tamil Meaning)**: Explanation in Tamil (mk field)
+4. **Translation**: English translation of the kural
+5. **Meaning**: Detailed English explanation of the context and wisdom
+
+All in a clean, card-based layout with Tamil font support!
 
 ## 🧠 Technical Stack
 
@@ -183,10 +195,9 @@ or
   "number": 786,
   "line1": "Tamil text line 1",
   "line2": "Tamil text line 2",
+  "mk": "Tamil meaning",
   "eng": "English translation",
-  "eng_exp": "Detailed explanation",
-  "chapter_group_eng": "Chapter group",
-  "chapter_eng": "Chapter name"
+  "eng_exp": "Detailed explanation"
 }
 ```
 

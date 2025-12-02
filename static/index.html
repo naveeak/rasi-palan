@@ -43,11 +43,15 @@
                 <div class="kural-card">
                     <div class="kural-header">
                         <span class="kural-number">Kural #<span id="kuralNumber"></span></span>
-                        <span class="kural-chapter">Chapter: <span id="kuralChapter"></span></span>
                     </div>
 
                     <div class="tamil-section">
                         <p id="kuralTamil" class="tamil-text"></p>
+                    </div>
+
+                    <div class="tamil-meaning-section">
+                        <h3>Tamil Meaning</h3>
+                        <p id="kuralTamilMeaning" class="tamil-text"></p>
                     </div>
 
                     <div class="english-section">
@@ -122,10 +126,12 @@
                 }
 
                 document.getElementById('kuralNumber').textContent = data.number;
-                document.getElementById('kuralChapter').textContent = data.chapter_group_eng + " / " + data.chapter_eng;
 
                 // Format Tamil text (line 1 and 2)
                 document.getElementById('kuralTamil').innerHTML = data.line1 + "<br>" + data.line2;
+
+                // Tamil meaning
+                document.getElementById('kuralTamilMeaning').textContent = data.mk || '';
 
                 document.getElementById('kuralEnglish').textContent = data.eng;
                 document.getElementById('kuralMeaning').textContent = data.eng_exp;
