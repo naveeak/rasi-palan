@@ -35,14 +35,66 @@ header {
     margin-bottom: 3rem;
 }
 
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.valluvar-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-color);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.header-text {
+    flex: 1;
+    max-width: 600px;
+    text-align: left;
+}
+
 header h1 {
     font-size: 2.5rem;
     color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.tamil-heading {
+    font-family: 'Noto Sans Tamil', sans-serif;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
 header p {
     color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .header-text {
+        text-align: center;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .tamil-heading {
+        font-size: 1.2rem;
+    }
 }
 
 .tabs {
@@ -186,9 +238,10 @@ button:disabled {
 
 .tamil-meaning-section {
     margin-bottom: 2rem;
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 0.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border-left: 4px solid var(--primary-color);
 }
 
 .tamil-text {
@@ -210,14 +263,33 @@ button:disabled {
 }
 
 h3 {
-    font-size: 0.875rem;
+    font-size: 0.95rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+h3::before {
+    content: "";
+    width: 4px;
+    height: 16px;
+    background-color: var(--primary-color);
+    border-radius: 2px;
 }
 
 .english-text {
     font-style: italic;
     font-size: 1.1rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.meaning-section p {
+    color: var(--text-primary);
+    line-height: 1.8;
 }
