@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thirukkural Matcher</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Tamil:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Thirukkural Matcher</h1>
+            <p>Paste an article or text below to find the most relevant Thirukkural.</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <textarea id="articleInput" placeholder="Enter your text here..."></textarea>
+                <button id="analyzeBtn" onclick="analyzeText()">Find Matching Kural</button>
+            </div>
+
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Analyzing meaning...</p>
+            </div>
+
+            <div id="result" class="hidden">
+                <div class="kural-card">
+                    <div class="kural-header">
+                        <span class="kural-number">Kural #<span id="kuralNumber"></span></span>
+                        <span class="kural-chapter">Chapter: <span id="kuralChapter"></span></span>
+                    </div>
+                    
+                    <div class="tamil-section">
+                        <p id="kuralTamil" class="tamil-text"></p>
+                    </div>
+
+                    <div class="english-section">
+                        <h3>Translation</h3>
+                        <p id="kuralEnglish" class="english-text"></p>
+                    </div>
+
+                    <div class="meaning-section">
+                        <h3>Meaning</h3>
+                        <p id="kuralMeaning"></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        async function analyzeText() {
+            const text = document.getElementById('articleInput').value;
+            if (!text.trim()) return;
+
+            const btn = document.getElementById('analyzeBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+
+            btn.disabled = true;
+            loading.classList.remove('hidden');
+            result.classList.add('hidden');
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text }),
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+
+                document.getElementById('kuralNumber').textContent = data.number;
+                document.getElementById('kuralChapter').textContent = data.chapter_group_eng + " / " + data.chapter_eng;
+                
+                // Format Tamil text (line 1 and 2)
+                document.getElementById('kuralTamil').innerHTML = data.line1 + "<br>" + data.line2;
+                
+                document.getElementById('kuralEnglish').textContent = data.eng;
+                document.getElementById('kuralMeaning').textContent = data.eng_exp;
+
+                result.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while analyzing the text.');
+            } finally {
+                btn.disabled = false;
+                loading.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
