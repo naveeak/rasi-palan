@@ -7,6 +7,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer, util
+from bs4 import BeautifulSoup
+from typing import Optional
 
 app = FastAPI()
 
@@ -21,7 +23,8 @@ embeddings = None
 model = None
 
 class AnalysisRequest(BaseModel):
-    text: str
+    text: Optional[str] = None
+    url: Optional[str] = None
 
 def download_json():
     if not os.path.exists(JSON_FILE):
@@ -30,6 +33,44 @@ def download_json():
         with open(JSON_FILE, "wb") as f:
             f.write(response.content)
         print("Download complete.")
+
+def extract_text_from_url(url: str) -> str:
+    """Extract text content from a web page URL."""
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Remove script and style elements
+        for script in soup(["script", "style", "nav", "footer", "header"]):
+            script.decompose()
+        
+        # Get text from common article containers
+        article_tags = soup.find_all(['article', 'main', 'div'], class_=lambda x: x and any(
+            term in str(x).lower() for term in ['content', 'article', 'post', 'entry']
+        ))
+        
+        if article_tags:
+            text = ' '.join([tag.get_text(separator=' ', strip=True) for tag in article_tags])
+        else:
+            # Fallback to all paragraphs
+            paragraphs = soup.find_all('p')
+            text = ' '.join([p.get_text(separator=' ', strip=True) for p in paragraphs])
+        
+        # Clean up whitespace
+        text = ' '.join(text.split())
+        
+        if not text or len(text) < 50:
+            raise ValueError("Insufficient text extracted from URL")
+        
+        return text
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to extract text from URL: {str(e)}")
 
 @app.on_event("startup")
 async def startup_event():
@@ -91,8 +132,17 @@ async def analyze_text(request: AnalysisRequest):
     if not model or embeddings is None:
         raise HTTPException(status_code=503, detail="Model not loaded yet")
     
+    # Validate input
+    if not request.text and not request.url:
+        raise HTTPException(status_code=400, detail="Either text or url must be provided")
+    
+    # Get text from URL or use provided text
+    text_to_analyze = request.text
+    if request.url:
+        text_to_analyze = extract_text_from_url(request.url)
+    
     # Encode the user's text
-    query_embedding = model.encode(request.text, convert_to_tensor=True)
+    query_embedding = model.encode(text_to_analyze, convert_to_tensor=True)
     
     # Compute cosine similarities
     cosine_scores = util.cos_sim(query_embedding, embeddings)[0]

@@ -4,3 +4,4 @@ sentence-transformers
 requests
 numpy
 python-multipart
+beautifulsoup4

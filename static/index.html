@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thirukkural Matcher</title>
     <link rel="stylesheet" href="/static/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Tamil:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Tamil:wght@400;500;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -15,9 +19,19 @@
         </header>
 
         <main>
-            <div class="input-section">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('text')">Text</button>
+                <button class="tab-btn" onclick="switchTab('url')">Article URL</button>
+            </div>
+
+            <div id="textInput" class="input-section">
                 <textarea id="articleInput" placeholder="Enter your text here..."></textarea>
                 <button id="analyzeBtn" onclick="analyzeText()">Find Matching Kural</button>
+            </div>
+
+            <div id="urlInput" class="input-section hidden">
+                <input type="url" id="articleUrl" placeholder="Enter article URL (e.g., https://example.com/article)">
+                <button id="analyzeUrlBtn" onclick="analyzeUrl()">Find Matching Kural</button>
             </div>
 
             <div id="loading" class="hidden">
@@ -31,7 +45,7 @@
                         <span class="kural-number">Kural #<span id="kuralNumber"></span></span>
                         <span class="kural-chapter">Chapter: <span id="kuralChapter"></span></span>
                     </div>
-                    
+
                     <div class="tamil-section">
                         <p id="kuralTamil" class="tamil-text"></p>
                     </div>
@@ -50,11 +64,40 @@
         </main>
     </div>
     <script>
+        function switchTab(tab) {
+            const textTab = document.getElementById('textInput');
+            const urlTab = document.getElementById('urlInput');
+            const tabs = document.querySelectorAll('.tab-btn');
+
+            if (tab === 'text') {
+                textTab.classList.remove('hidden');
+                urlTab.classList.add('hidden');
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                textTab.classList.add('hidden');
+                urlTab.classList.remove('hidden');
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+            }
+        }
+
         async function analyzeText() {
             const text = document.getElementById('articleInput').value;
             if (!text.trim()) return;
 
-            const btn = document.getElementById('analyzeBtn');
+            await performAnalysis({ text: text }, 'analyzeBtn');
+        }
+
+        async function analyzeUrl() {
+            const url = document.getElementById('articleUrl').value;
+            if (!url.trim()) return;
+
+            await performAnalysis({ url: url }, 'analyzeUrlBtn');
+        }
+
+        async function performAnalysis(payload, btnId) {
+            const btn = document.getElementById(btnId);
             const loading = document.getElementById('loading');
             const result = document.getElementById('result');
 
@@ -68,22 +111,22 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ text: text }),
+                    body: JSON.stringify(payload),
                 });
 
                 const data = await response.json();
 
-                if (data.error) {
-                    alert('Error: ' + data.error);
+                if (data.error || data.detail) {
+                    alert('Error: ' + (data.error || data.detail));
                     return;
                 }
 
                 document.getElementById('kuralNumber').textContent = data.number;
                 document.getElementById('kuralChapter').textContent = data.chapter_group_eng + " / " + data.chapter_eng;
-                
+
                 // Format Tamil text (line 1 and 2)
                 document.getElementById('kuralTamil').innerHTML = data.line1 + "<br>" + data.line2;
-                
+
                 document.getElementById('kuralEnglish').textContent = data.eng;
                 document.getElementById('kuralMeaning').textContent = data.eng_exp;
 
@@ -98,4 +141,5 @@
         }
     </script>
 </body>
+
 </html>
